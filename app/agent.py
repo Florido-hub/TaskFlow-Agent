@@ -1,6 +1,6 @@
 import requests
 from langchain.agents import create_agent
-from app.tools import consultar_tarefas, somar
+from app.tools import *
 from langchain_ollama import ChatOllama
 from langgraph.checkpoint.memory import InMemorySaver
 
@@ -37,7 +37,7 @@ def _carregar_system_prompt() -> str:
 def _criar_agent():
     return create_agent(
         model=model,
-        tools=[consultar_tarefas],
+        tools=[consultar_tarefas, criar_tarefa],
         system_prompt=_carregar_system_prompt(),
         checkpointer=checkpointer
     )
