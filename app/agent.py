@@ -2,6 +2,7 @@ import requests
 from langchain.agents import create_agent
 from app.tools import consultar_tarefas, somar
 from langchain_ollama import ChatOllama
+from langgraph.checkpoint.memory import InMemorySaver
 
 import os
 from pathlib import Path
@@ -13,6 +14,8 @@ load_dotenv(caminho_env)
 
 TEMPERATURA = 0.1
 TIMEOUT = 600
+
+checkpointer = InMemorySaver()
 
 # Modelo
 model = ChatOllama(
@@ -35,21 +38,31 @@ def _criar_agent():
     return create_agent(
         model=model,
         tools=[consultar_tarefas],
-        system_prompt=_carregar_system_prompt()
+        system_prompt=_carregar_system_prompt(),
+        checkpointer=checkpointer
     )
 
 agent = _criar_agent()
 
 
-def perguntar(pergunta: str) -> str:
+def perguntar(pergunta: str, sessao: str) -> str:
     """Envia uma pergunta ao TaskFlow Agent e retorna a resposta."""
 
     try:
-        resposta = agent.invoke({
-            "messages": [
-                {"role": "user", "content": pergunta}
-            ]
-        })
+        config = {
+            "configurable": {
+                "thread_id": sessao
+            }
+        }
+
+        resposta = agent.invoke(
+            {
+                "messages": [
+                    {"role": "user", "content": pergunta}
+                ]
+            },
+            config=config
+        )
 
         return resposta["messages"][-1].content.strip()
 
@@ -61,8 +74,13 @@ def perguntar(pergunta: str) -> str:
         )
 
 
+
+from uuid import uuid4
+
 def _modo_interativo() -> None:
     """Executa o chatbot no terminal."""
+
+    sessao = str(uuid4())
 
     print(
         f"TaskFlow Agent — provedor: Ollama | "
@@ -76,15 +94,19 @@ def _modo_interativo() -> None:
         except (EOFError, KeyboardInterrupt):
             print("\nAté logo!")
             break
+
         if not pergunta:
             continue
+
         if pergunta.lower() in {"sair", "exit", "quit"}:
             print("Até logo!")
             break
+
         try:
-            print(f"\nBot: {perguntar(pergunta)}\n")
+            print(f"\nBot: {perguntar(pergunta, sessao)}\n")
         except Exception as erro:
             print(f"\n[erro] {erro}\n")
+
 
 
 if __name__ == "__main__":
