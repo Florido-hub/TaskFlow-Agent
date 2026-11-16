@@ -1,10 +1,8 @@
 # TaskFlow Agent
 
-**Assistente virtual inteligente para gerenciamento de tarefas, desenvolvido com Python, LangChain e Ollama.**
+**Assistente virtual inteligente para gerenciamento de tarefas, desenvolvido com Python, LangChain e Langgraph.**
 
 O TaskFlow Agent é um agente conversacional integrado ao [TaskFlow API](https://github.com/Florido-hub/TaskFlow), permitindo que usuários interajam com suas tarefas por meio de linguagem natural.
-
-Utilizando modelos de linguagem (LLMs) executados localmente com Ollama e o mecanismo de *Tool Calling* do LangChain, o agente interpreta solicitações e utiliza ferramentas para consultar e gerenciar informações disponibilizadas pelo backend.
 
 ## Arquitetura
 
@@ -52,8 +50,6 @@ O agente não acessa diretamente o banco de dados. Toda operação sobre as tare
 | Python | Linguagem de desenvolvimento |
 | LangChain | Construção e orquestração do agente |
 | LangGraph | Execução do fluxo de agentes |
-| Ollama | Execução local dos modelos de linguagem |
-| ChatOllama | Integração entre LangChain e Ollama |
 | Requests | Comunicação HTTP com a API |
 | Python-dotenv | Gerenciamento de variáveis de ambiente |
 
@@ -63,7 +59,7 @@ Antes de executar o projeto, certifique-se de possuir:
 
 - Python 3.10 ou superior.
 - Git.
-- Ollama instalado e em execução.
+- Ollama ou Google AI instalado e em execução.
 - Um modelo de linguagem compatível com Tool Calling.
 - TaskFlow API em execução.
 
