@@ -1,4 +1,5 @@
 import os
+from datetime import date
 from uuid import UUID
 
 import requests
@@ -9,12 +10,17 @@ load_dotenv()
 
 BASE_URL = os.getenv("TASKFLOW_API_URL")
 
-def criar_nova_tarefa(
+def create_new_task(
     titulo: str,
     descricao: str,
     prioridade: str,
     data_prevista: str
 ):
+    try:
+        date.fromisoformat(data_prevista)
+    except ValueError:
+        raise ValueError("A data deve estar no formato YYYY-MM-DD.")
+
     response = requests.post(
         f"{BASE_URL}/tasks",
         json={
@@ -26,15 +32,53 @@ def criar_nova_tarefa(
         timeout=15
     )
 
-    if not response.ok:
+    if not response.status_code == 201:
         raise Exception(
             f"Erro ao criar tarefa: {response.status_code} - {response.text}"
         )
 
-    return response
+    if response.text.strip():
+        return response.json()
+
+    return "Task criada com sucesso."
+
+def update_task(
+    task_id: str,
+    titulo: str,
+    descricao: str,
+    prioridade: str,
+    data_prevista: str
+):
+    try:
+        UUID(task_id)
+    except ValueError:
+        raise ValueError("O ID informado não é um UUID válido.")
+
+    try:
+        date.fromisoformat(data_prevista)
+    except ValueError:
+        raise ValueError("A data deve estar no formato YYYY-MM-DD.")
+
+    response = requests.patch(
+        f"{BASE_URL}/tasks/{task_id}",
+        json={
+            "title": titulo,
+            "description": descricao,
+            "priority": prioridade,
+            "dueDate": data_prevista
+        },
+        timeout=15
+    )
+
+    if not response.status_code == 204:
+        raise Exception(
+            f"Erro ao atualizar tarefa: {response.status_code} - {response.text}"
+        )
+
+    return "Tarefa atualizada com sucesso."
 
 
-def iniciar_tarefa(task_id: str):
+def start_task(task_id: str):
     try:
         UUID(task_id)
     except ValueError:
@@ -55,8 +99,29 @@ def iniciar_tarefa(task_id: str):
 
     return "Tarefa iniciada com sucesso."
 
+def complete_task(task_id: str):
+    try:
+        UUID(task_id)
+    except ValueError:
+        raise ValueError("O ID informado não é um UUID válido.")
 
-def listar_tarefas():
+    response = requests.patch(
+        f"{BASE_URL}/tasks/{task_id}/complete",
+        timeout=15
+    )
+
+    if not response.ok:
+        raise Exception(
+            f"Erro ao concluir tarefa: {response.status_code} - {response.text}"
+        )
+
+    if response.text.strip():
+        return response.json()
+
+    return "Tarefa concluída com sucesso."
+
+
+def get_tasks():
     response = requests.get(
         f"{BASE_URL}/tasks",
         timeout=15
@@ -65,3 +130,22 @@ def listar_tarefas():
     response.raise_for_status()
 
     return response.json()
+
+
+def delete_task(task_id: str):
+    try:
+        UUID(task_id)
+    except ValueError:
+        raise ValueError("O ID informado não é um UUID válido.")
+
+    response = requests.delete(
+        f"{BASE_URL}/tasks/{task_id}",
+        timeout=15
+    )
+
+    if not response.status_code == 204:
+        raise Exception(
+            f"Erro ao deletar tarefa: {response.status_code} - {response.text}"
+        )
+
+    return "Tarefa deletada com sucesso."
