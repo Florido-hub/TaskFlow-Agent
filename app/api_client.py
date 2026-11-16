@@ -1,4 +1,6 @@
 import os
+from uuid import UUID
+
 import requests
 
 from dotenv import load_dotenv
@@ -32,6 +34,26 @@ def criar_nova_tarefa(
     return response
 
 
+def iniciar_tarefa(task_id: str):
+    try:
+        UUID(task_id)
+    except ValueError:
+        raise ValueError("O ID informado não é um UUID válido.")
+
+    response = requests.patch(
+        f"{BASE_URL}/tasks/{task_id}/start",
+        timeout=15
+    )
+
+    if not response.ok:
+        raise Exception(
+            f"Erro ao iniciar tarefa: {response.status_code} - {response.text}"
+        )
+
+    if response.text.strip():
+        return response.json()
+
+    return "Tarefa iniciada com sucesso."
 
 
 def listar_tarefas():
