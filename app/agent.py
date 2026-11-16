@@ -1,12 +1,11 @@
-import requests
+from pathlib import Path
+from uuid import uuid4
+
 from langchain.agents import create_agent
-from app.tools import *
 from langchain_ollama import ChatOllama
 from langgraph.checkpoint.memory import InMemorySaver
 
-import os
-from pathlib import Path
-from dotenv import load_dotenv
+from app.tools import *
 
 BASE_DIR = Path(__file__).parent
 caminho_env = Path(__file__).resolve().parent / ".env"
@@ -17,7 +16,6 @@ TIMEOUT = 600
 
 checkpointer = InMemorySaver()
 
-# Modelo
 model = ChatOllama(
     model=os.getenv("OLLAMA_MODEL"),
     base_url=os.getenv("OLLAMA_URL"),
@@ -35,9 +33,10 @@ def _carregar_system_prompt() -> str:
 
 
 def _criar_agent():
+    """Cria o agente utilizando o metodo do Langchain"""
     return create_agent(
         model=model,
-        tools=[consultar_tarefas, criar_tarefa],
+        tools=[consultar_tarefas, criar_tarefa, iniciar_tarefa],
         system_prompt=_carregar_system_prompt(),
         checkpointer=checkpointer
     )
@@ -73,9 +72,6 @@ def perguntar(pergunta: str, sessao: str) -> str:
             f"e se o modelo foi baixado (ollama pull {os.getenv('OLLAMA_MODEL')})."
         )
 
-
-
-from uuid import uuid4
 
 def _modo_interativo() -> None:
     """Executa o chatbot no terminal."""
