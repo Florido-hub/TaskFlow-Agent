@@ -67,7 +67,11 @@ Antes de executar o projeto, certifique-se de possuir:
 - Um modelo de linguagem compatível com Tool Calling.
 - TaskFlow API em execução.
 
-## 1. Instalação do Ollama
+# 1. Modelo do Agente:
+
+## Instalação do Ollama
+
+### 1. Baixe o ollama
 
 O [Ollama](https://ollama.com/) permite executar modelos de linguagem localmente, sem depender de uma API de inferência hospedada externamente.
 
@@ -87,7 +91,7 @@ Por padrão, o serviço local do Ollama utiliza o endereço:
 http://localhost:11434
 ```
 
-## 2. Escolha do modelo de linguagem
+### 2. Escolha do modelo de linguagem
 
 **Atenção: o modelo precisa oferecer suporte a Tool Calling.**
 
@@ -103,7 +107,7 @@ Algumas opções disponíveis no Ollama:
 
 Consulte também a [documentação oficial de Tool Calling do Ollama](https://docs.ollama.com/capabilities/tool-calling).
 
-### Baixando um modelo
+### 3. Baixando um modelo
 
 Como exemplo, utilizando Qwen 2.5:
 
@@ -124,6 +128,38 @@ ollama run qwen2.5:7b
 ```
 
 **Observação:** o tamanho do modelo influencia os requisitos de memória e desempenho. Escolha uma variante compatível com os recursos disponíveis no seu computador.
+
+## Instalação do Google AI (Gemini)
+
+Se o seu computador não tem recursos para rodar um modelo local, ou se você prefere um modelo hospedado, o agente também pode usar a API do Google AI (Gemini). Nesse caso, você **não precisa instalar o Ollama** nem baixar modelos.
+
+### 1. Criar a chave de API
+
+1. Acesse o [Google AI Studio](https://aistudio.google.com/apikey) e entre com sua conta Google.
+2. Clique em **Create API key** (Criar chave de API).
+3. Escolha ou crie um projeto e copie a chave gerada.
+
+> **Importante:** trate a chave como uma senha. Não a publique nem a envie para o repositório.
+
+### 2. Instalar o pacote
+
+Com o ambiente virtual ativado:
+
+```bash
+pip install langchain-google-genai
+```
+
+Se aparecer o erro `No module named 'langchain_core.decisions'`, as versões do `langchain-google-genai` e do `langchain-core` estão incompatíveis. Resolva com uma das opções:
+
+```bash
+# Opção 1: atualizar o core
+pip install --upgrade "langchain-core>=1.8" "langchain>=1.5"
+
+# Opção 2: fixar a versão anterior do pacote do Google
+pip install "langchain-google-genai==4.4.2"
+```
+
+> A Opção 1 exige Python 3.11 ou superior.
 
 ## 3. Clonando o projeto
 
@@ -180,19 +216,20 @@ Crie um arquivo `.env` na raiz do projeto, utilizando o `.env.example` como refe
 Exemplo:
 
 ```env
+# Provider: google ou ollama
+AI_PROVIDER= seu_provider_aqui
+
+# Google AI Studio
+GOOGLE_API_KEY=sua_chave_aqui
+GEMINI_MODEL=gemini-3.8-flash
+
 # Ollama
 OLLAMA_URL=http://localhost:11434
-OLLAMA_MODEL=qwen2.5:7b | llama3.1:8b
+OLLAMA_MODEL=qwen3.5:4b | qwen 2.5:7b | llama3.1:8b
 
-# TaskFlow API
+# Api Taskflow
 TASKFLOW_API_URL=chave_api_aqui
 ```
-
-Ajuste os valores de acordo com seu ambiente.
-
-- `OLLAMA_URL`: endereço do serviço Ollama.
-- `OLLAMA_MODEL`: modelo instalado e compatível com Tool Calling.
-- `TASKFLOW_API_URL`: endereço-base da API TaskFlow.
 
 **Importante:** não compartilhe seu arquivo `.env` nem envie credenciais ou informações sensíveis para o repositório.
 
