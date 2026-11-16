@@ -333,10 +333,10 @@ O projeto está sendo desenvolvido para permitir a interação com o gerenciamen
 - [x] Construção do agente com LangChain.
 - [x] Estrutura para definição de ferramentas (*Tool Calling*).
 - [x] Comunicação HTTP com a TaskFlow API.
-- [ ] Consulta de tarefas por linguagem natural.
-- [ ] Criação de tarefas por linguagem natural.
-- [ ] Atualização e conclusão de tarefas.
-- [ ] Memória conversacional.
+- [x] Consulta de tarefas por linguagem natural.
+- [x] Criação de tarefas por linguagem natural.
+- [x] Atualização e conclusão de tarefas.
+- [x] Memória conversacional.
 - [ ] Disponibilização do agente por meio de uma API HTTP com FastAPI.
 - [ ] Testes automatizados com Deepeval metrics
 - [ ] Integração contínua.
